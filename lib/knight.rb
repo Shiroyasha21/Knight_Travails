@@ -1,49 +1,44 @@
-class ActionNode
-  attr_accessor :x, :y, :value, :child
-
-  def initialize(coordinate)
-    @x = coordinate[0]
-    @y = coordinate[1]
-    @value = [x,y]
-    @child = []
-  end
-
-  def add_child(node)
-    return if node.nil?
-
-    @child << node
-  end
-end
-
 class Knight
-  attr_accessor :start
+  attr_accessor :x, :y
 
-  def initialize(coordinate)
-    @start = create_action_graph(coordinate)
-  end
-
-  def create_action_graph(coordinate)
-    x = coordinate[0]
-    y = coordinate[1]
-    return nil if x.negative? || y.negative?
-    return nil if x > 7 || y > 7
-    
-    start = ActionNode.new(coordinate)
-
-    start.add_child(create_action_graph([(x + 1), (y + 2)]))
-
-    
-    start
+  def initialize
+    @x = [1, 2, 1, -1, -2, -2, 2, -1]
+    @y = [2, 1, -2, 2, -1, 1, -1, -2]
   end
 end
 
-k = Knight.new([5,5])
+def knight_moves(initial, destination)
+  knight = Knight.new
 
-puts 'Start'
-p k.start
-puts 'Child'
-p k.start.child
+  x = knight.x
+  y = knight.y
+  
+  square_queue = [initial]
+  visited = []
+  path_taken = []
 
-def knight_moves(initial_pos, target)
-  possible_actions = Knight.new(initial_pos)
+  while !square_queue.empty?
+    curr_coord = square_queue.shift
+    visited << curr_coord
+    x_q = curr_coord[0]
+    y_q = curr_coord[1]
+
+    if x_q == destination[0] && y_q == destination[1]
+      return path_taken
+    else
+      x.zip(y).each do |xx, yy|
+        new_coord = []
+
+        sum_x = xx + x_q 
+        sum_y = yy + y_q
+        if ((sum_x).positive? && (sum_y).positive?) && ((sum_x) <= 7 && (sum_y) <= 7)
+          visited.any?([sum_x,sum_y]) || square_queue.any?([sum_x, sum_y]) ? next : new_coord.push((sum_x), (sum_y))
+
+          square_queue << new_coord
+        end
+      end
+    end
+  end
 end
+
+p knight_moves([3,3], [4,3])
