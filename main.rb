@@ -3,13 +3,11 @@ require_relative 'lib/board'
 
 # Find the shortest path to the square destination
 def knight_moves(initial, destination)
-  arr = []
-
   tree = create_tree(initial)
-  path = breadth_first(tree, destination)
+  path = breadth_first(initial, tree, destination)
 
   puts "You made it in 3 moves! Here's your path: "
-  path.each { |el| p el}
+  path.each { |el| p el }
 end
 
 # Create the tree from possible moves of Knight
@@ -37,7 +35,7 @@ def create_tree(root)
       sum_y = yy + curr_y
       new_move = [sum_x, sum_y]
 
-      next if sum_x.negative? || sum_y.negative? || (sum_x > 3) || (sum_y > 3)
+      next if sum_x.negative? || sum_y.negative? || (sum_x > 7) || (sum_y > 7)
       next unless dequeue.none?(new_move) && queue.none?(new_move)
 
       # Add the new move and edge
@@ -53,8 +51,33 @@ def create_tree(root)
   board
 end
 
-# Traverse the tree
-def breadth_first(tree)
+tree = create_tree([0,0])
 
+# Traverse the tree
+def breadth_first(tree, initial, destination)
+  start = nil
+  tree.nodes.each_value { |el| start = el if el.value == initial }
+
+  queue = [start]
+  path_taken = []
+
+  until queue.empty?
+    first_q = queue.shift
+    path_taken << first_q.value
+
+    return path_taken if first_q.value == destination
+
+    first_q.adjacent_nodes.each do |node|
+      if queue.none?(node) && path_taken.none?(node.value)
+        adj_node = nil
+        tree.nodes.each_value { |i| adj_node = i if node.value == i.value }
+        return path_taken << adj_node.value if adj_node.value == destination
+
+        queue << adj_node
+      end
+    end
+  end
+  path_taken
 end
 
+p breadth_first(tree, [0,0], [0,1])
