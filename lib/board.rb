@@ -1,3 +1,5 @@
+# The square/nodes of the board.
+# Contains the coordinates as vertices and edges
 class BoardNode
   attr_accessor :value, :edge
 
@@ -23,4 +25,3 @@ class Board
     @nodes << BoardNode.new(value)
   end
 end
-
