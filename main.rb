@@ -3,15 +3,17 @@ require_relative 'lib/board'
 
 # Find the shortest path to the square destination
 def knight_moves(initial, destination)
-  tree = create_tree(initial)
-  path = breadth_first(initial, tree, destination)
+  graph = create_graph(initial)
+  parent_path = breadth_first(graph, initial, destination)
+  path = reconstruct_path(parent_path, initial, destination).reverse
 
-  puts "You made it in 3 moves! Here's your path: "
+  puts "Knight initial position: #{initial}, move to #{destination}"
+  puts "You made it in #{path.length - 1} moves! Here's your path: "
   path.each { |el| p el }
 end
 
-# Create the tree from possible moves of Knight
-def create_tree(root)
+# Create the graph from possible moves of Knight
+def create_graph(root)
   knight = Knight.new
   board = Board.new
 
@@ -45,39 +47,45 @@ def create_tree(root)
 
       # Add the new move to the queue
       queue << new_move
-
     end
   end
   board
 end
 
-tree = create_tree([0,0])
-
-# Traverse the tree
-def breadth_first(tree, initial, destination)
+# Traverse the graph
+def breadth_first(graph, initial, destination)
   start = nil
-  tree.nodes.each_value { |el| start = el if el.value == initial }
+  graph.nodes.each_value { |el| start = el if el.value == initial }
 
   queue = [start]
-  path_taken = []
+  # Stores the parents of the adjacent nodes
+  level_order = { start => start }
 
   until queue.empty?
     first_q = queue.shift
-    path_taken << first_q.value
-
-    return path_taken if first_q.value == destination
 
     first_q.adjacent_nodes.each do |node|
-      if queue.none?(node) && path_taken.none?(node.value)
-        adj_node = nil
-        tree.nodes.each_value { |i| adj_node = i if node.value == i.value }
-        return path_taken << adj_node.value if adj_node.value == destination
+      next if queue.any?(node) && level_order.any?(node.value)
 
-        queue << adj_node
-      end
+      adj_node = nil
+      graph.nodes.each_value { |i| adj_node = i if node.value == i.value }
+      level_order[adj_node] = first_q
+      queue << adj_node
     end
+    return level_order if first_q.value == destination
   end
-  path_taken
+  level_order
 end
 
-p breadth_first(tree, [0,0], [0,1])
+# Reconstruct the level-order hash
+def reconstruct_path(hash, initial, destination, arr = [])
+  return arr << initial if destination == initial
+
+  # Check hash for the destination and backtrack until initial is reached
+  hash.each_pair do |k,v|
+    reconstruct_path(hash, initial, v.value, arr << k.value) if k.value == destination
+  end
+  arr
+end
+
+knight_moves([4,5], [1,1])
