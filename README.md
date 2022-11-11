@@ -6,3 +6,6 @@ original position to destination chosen by the user.
 
 Breadth-First Search is used in determining the shortest path in the graph.
 The graph has nodes of all possible moves the Knight can make in its current position.
+
+Notes:
+  

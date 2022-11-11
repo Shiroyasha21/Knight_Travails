@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Contains all possible moves of the knight piece
 class Knight
   attr_accessor :x, :y
