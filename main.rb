@@ -33,11 +33,10 @@ def create_graph(root)
     board.add_node(root_node)
 
     x.zip(y).each do |xx, yy|
-      sum_x = xx + curr_x
-      sum_y = yy + curr_y
-      new_move = [sum_x, sum_y]
+      new_move = [(xx + curr_x), (yy + curr_y)]
 
-      next if sum_x.negative? || sum_y.negative? || (sum_x > 7) || (sum_y > 7)
+      # Discard new move if out of the board
+      next if new_move.any? { |move| move.negative? || move > 7 }
       next unless dequeue.none?(new_move) && queue.none?(new_move)
 
       # Add the new move and edge
@@ -65,8 +64,6 @@ def breadth_first(graph, initial, destination)
     first_q = queue.shift
 
     first_q.adjacent_nodes.each do |node|
-      next if queue.any?(node) && level_order.any?(node.value)
-
       adj_node = nil
       graph.nodes.each_value { |i| adj_node = i if node.value == i.value }
       level_order[adj_node] = first_q
@@ -88,4 +85,4 @@ def reconstruct_path(hash, initial, destination, arr = [])
   arr
 end
 
-knight_moves([4,5], [1,1])
+knight_moves([3,3], [4,3])
